@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "dgSpecHash": "DGZZg0SqoOY=",
+  "success": true,
+  "projectFilePath": "/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/StrayCat.Application.csproj",
+  "expectedPackageFiles": [
+    "/Users/ibr/.nuget/packages/awssdk.core/4.0.3.28/awssdk.core.4.0.3.28.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/awssdk.s3/4.0.21/awssdk.s3.4.0.21.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/microsoft.entityframeworkcore/8.0.0/microsoft.entityframeworkcore.8.0.0.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/microsoft.entityframeworkcore.abstractions/8.0.0/microsoft.entityframeworkcore.abstractions.8.0.0.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/microsoft.entityframeworkcore.analyzers/8.0.0/microsoft.entityframeworkcore.analyzers.8.0.0.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/microsoft.entityframeworkcore.relational/8.0.0/microsoft.entityframeworkcore.relational.8.0.0.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/microsoft.identitymodel.abstractions/8.17.0/microsoft.identitymodel.abstractions.8.17.0.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/microsoft.identitymodel.jsonwebtokens/8.17.0/microsoft.identitymodel.jsonwebtokens.8.17.0.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/microsoft.identitymodel.logging/8.17.0/microsoft.identitymodel.logging.8.17.0.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/microsoft.identitymodel.tokens/8.17.0/microsoft.identitymodel.tokens.8.17.0.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/npgsql/8.0.0/npgsql.8.0.0.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/npgsql.entityframeworkcore.postgresql/8.0.0/npgsql.entityframeworkcore.postgresql.8.0.0.nupkg.sha512",
+    "/Users/ibr/.nuget/packages/system.identitymodel.tokens.jwt/8.17.0/system.identitymodel.tokens.jwt.8.17.0.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c",
+      "projectPath": "/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/StrayCat.Application.csproj",
+      "warningLevel": 1,
+      "filePath": "/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/StrayCat.Application.csproj",
+      "libraryId": "Npgsql",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}

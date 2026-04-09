@@ -1,0 +1,17 @@
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/bin/Debug/net10.0/StrayCat.Application.deps.json
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/bin/Debug/net10.0/StrayCat.Application.dll
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/bin/Debug/net10.0/StrayCat.Application.pdb
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/bin/Debug/net10.0/StrayCat.Domain.dll
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/bin/Debug/net10.0/StrayCat.Infrastructure.dll
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/bin/Debug/net10.0/StrayCat.Infrastructure.pdb
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/bin/Debug/net10.0/StrayCat.Domain.pdb
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/StrayCat.Application.csproj.AssemblyReference.cache
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/StrayCat.Application.GeneratedMSBuildEditorConfig.editorconfig
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/StrayCat.Application.AssemblyInfoInputs.cache
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/StrayCat.Application.AssemblyInfo.cs
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/StrayCat.Application.csproj.CoreCompileInputs.cache
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/StrayCat.AF32F313.Up2Date
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/StrayCat.Application.dll
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/refint/StrayCat.Application.dll
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/StrayCat.Application.pdb
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/ref/StrayCat.Application.dll

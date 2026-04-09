@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="StrayCat.API/StrayCat.API.csproj" />
+  <Project Path="StrayCat.Application/StrayCat.Application.csproj" />
+  <Project Path="StrayCat.Domain/StrayCat.Domain.csproj" />
+  <Project Path="StrayCat.Infrastructure/StrayCat.Infrastructure.csproj" />
+</Solution>
