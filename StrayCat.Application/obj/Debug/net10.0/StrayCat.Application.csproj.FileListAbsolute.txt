@@ -15,3 +15,4 @@
 /Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/refint/StrayCat.Application.dll
 /Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/StrayCat.Application.pdb
 /Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/ref/StrayCat.Application.dll
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Application/obj/Debug/net10.0/StrayCat.Application.sourcelink.json

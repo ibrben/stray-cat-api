@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  # Override for development environment
+  api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      - "5000:80"
+    volumes:
+      - ./StrayCat.API/appsettings.Development.json:/app/appsettings.Development.json:ro
+
+  postgres:
+    ports:
+      - "5432:5432"

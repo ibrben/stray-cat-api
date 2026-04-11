@@ -13,3 +13,6 @@
 /Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Infrastructure/obj/Debug/net10.0/refint/StrayCat.Infrastructure.dll
 /Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Infrastructure/obj/Debug/net10.0/StrayCat.Infrastructure.pdb
 /Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Infrastructure/obj/Debug/net10.0/ref/StrayCat.Infrastructure.dll
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Infrastructure/obj/Debug/net10.0/StrayCat.Infrastructure.sourcelink.json
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Infrastructure/bin/Debug/net10.0/StrayCat.Infrastructure.runtimeconfig.json
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Infrastructure/obj/Debug/net10.0/StrayCat.Infrastructure.genruntimeconfig.cache

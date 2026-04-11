@@ -17,7 +17,7 @@ namespace StrayCat.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "9.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -119,6 +119,9 @@ namespace StrayCat.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("GoogleId")
+                        .HasColumnType("text");
+
                     b.Property<bool>("InviteTokenUsed")
                         .HasColumnType("boolean");
 
@@ -127,6 +130,9 @@ namespace StrayCat.Infrastructure.Migrations
 
                     b.Property<bool>("IsVerified")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("MobilePhone")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -137,6 +143,9 @@ namespace StrayCat.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()

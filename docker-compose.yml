@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: straycat-postgres
+    environment:
+      POSTGRES_DB: straycat
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - straycat-network
+    restart: unless-stopped
+
+  # StrayCat API Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: straycat-api
+    ports:
+      - "5000:80"
+      - "5001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=straycat;Username=postgres;Password=postgres
+    depends_on:
+      - postgres
+    networks:
+      - straycat-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  straycat-network:
+    driver: bridge

@@ -21,6 +21,13 @@ namespace StrayCat.Domain.Entities
         
         public bool InviteTokenUsed { get; set; }
         
+        // Google OAuth properties
+        public string? GoogleId { get; set; }
+        
+        public string? ProfilePictureUrl { get; set; }
+        
+        public string? MobilePhone { get; set; }
+        
         public DateTime CreatedAt { get; set; }
         
         public DateTime UpdatedAt { get; set; }

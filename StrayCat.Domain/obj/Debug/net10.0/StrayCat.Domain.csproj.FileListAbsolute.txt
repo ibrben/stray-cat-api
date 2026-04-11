@@ -9,3 +9,4 @@
 /Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Domain/obj/Debug/net10.0/refint/StrayCat.Domain.dll
 /Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Domain/obj/Debug/net10.0/StrayCat.Domain.pdb
 /Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Domain/obj/Debug/net10.0/ref/StrayCat.Domain.dll
+/Users/ibr/Desktop/prjStrayCat/stray-cat-api/StrayCat/StrayCat.Domain/obj/Debug/net10.0/StrayCat.Domain.sourcelink.json
