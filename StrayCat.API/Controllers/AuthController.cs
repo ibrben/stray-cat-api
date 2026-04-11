@@ -3,18 +3,21 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using StrayCat.Application.Services;
 using StrayCat.Application.DTOs;
+using StrayCat.Application.Interfaces;
 
 namespace StrayCat.API.Controllers
 {
     [ApiController]
-    [Route("api/auth")]
+    [Route("auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IUrlService _urlService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IUrlService urlService)
         {
             _authService = authService;
+            _urlService = urlService;
         }
 
         // POST: /api/auth/login
@@ -83,6 +86,63 @@ namespace StrayCat.API.Controllers
             catch
             {
                 return StatusCode(500, "An error occurred while fetching user information.");
+            }
+        }
+
+        // GET: /api/auth/google
+        [HttpGet("google")]
+        public IActionResult GoogleAuth()
+        {
+            try
+            {
+                var googleAuthUrl = _urlService.BuildGoogleAuthUrl();
+                return Redirect(googleAuthUrl);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while initiating Google authentication.");
+            }
+        }
+
+        // GET: /api/auth/google-callback
+        [HttpGet("google/callback")]
+        public async Task<IActionResult> GoogleCallback(string code, string error = null)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(error))
+                {
+                    return BadRequest($"Google authentication error: {error}");
+                }
+
+                if (string.IsNullOrEmpty(code))
+                {
+                    return BadRequest("Authorization code is required.");
+                }
+
+                var googleAuthRequest = new GoogleAuthRequestDto { Code = code };
+                var response = await _authService.AuthenticateWithGoogleAsync(googleAuthRequest);
+                
+                if (response == null){
+
+                    Console.WriteLine("Google authentication failed. User may not exist or be inactive.");
+                    return Unauthorized("Google authentication failed. User may not exist or be inactive.");
+                }
+
+                // Redirect to frontend with token
+                var callbackUrl = _urlService.BuildAuthCallbackUrl(response.Token);
+                return Redirect(callbackUrl);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle validation and authentication errors
+                var errorUrl = _urlService.BuildErrorUrl(ex.Message);
+                return Redirect(errorUrl);
+            }
+            catch (Exception ex)
+            {
+                var errorUrl = _urlService.BuildErrorUrl("An unexpected error occurred during Google authentication.");
+                return Redirect(errorUrl);
             }
         }
     }

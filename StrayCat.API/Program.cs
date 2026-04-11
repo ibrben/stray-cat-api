@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.Options;
 using StrayCat.Application.Interfaces;
 using StrayCat.Application.Services;
+using StrayCat.Application.Settings;
 using StrayCat.Infrastructure.Data;
 using StrayCat.Domain.Entities;
 using System.Security.Claims;
@@ -17,6 +19,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+// Configure strongly-typed settings
+builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("Frontend"));
+builder.Services.Configure<GoogleAuthSettings>(builder.Configuration.GetSection("Authentication:Google"));
+
+// Register settings as services for injection
+builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<FrontendSettings>>().Value);
+builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<GoogleAuthSettings>>().Value);
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -42,6 +52,15 @@ builder.Services.AddScoped<IReferenceCodeGenerator, ReferenceCodeGenerator>();
 
 // Register AuthService
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Register UrlService
+builder.Services.AddScoped<IUrlService, UrlService>();
+
+// Add HttpContextAccessor
+builder.Services.AddHttpContextAccessor();
+
+// Add HttpClient for Google authentication
+builder.Services.AddHttpClient();
 
 // Add Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
