@@ -268,7 +268,7 @@ namespace StrayCat.Application.Services
             var clientSecret = _configuration["Authentication:Google:ClientSecret"];
             
             // Use a fixed redirect URI that matches what we registered with Google
-            var redirectUri = "http://localhost:5169/auth/google/callback"; // Update this to match your actual API URL
+            var redirectUri = $"{_configuration["Authentication:Google:CallbackUri"]}/auth/google/callback"; // Update this to match your actual API URL
             
             var tokenEndpoint = "https://oauth2.googleapis.com/token";
             var parameters = new Dictionary<string, string>

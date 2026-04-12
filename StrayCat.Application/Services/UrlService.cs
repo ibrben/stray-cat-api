@@ -36,7 +36,7 @@ namespace StrayCat.Application.Services
             if (request == null)
                 throw new InvalidOperationException("HTTP context is not available");
 
-            var redirectUri = $"{request.Scheme}://{request.Host}/auth/google/callback";
+            var redirectUri = $"{_googleAuthSettings.CallbackUri}/auth/google/callback";
             var scope = "openid email profile";
             
             return $"https://accounts.google.com/o/oauth2/v2/auth?" +

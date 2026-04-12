@@ -5,5 +5,6 @@ namespace StrayCat.Application.Settings
         public string ClientId { get; set; } = string.Empty;
         public string ClientSecret { get; set; } = string.Empty;
         public string AllowedDomains { get; set; } = string.Empty;
+        public string CallbackUri { get; set; } = string.Empty;
     }
 }
