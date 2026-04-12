@@ -62,6 +62,9 @@ builder.Services.AddHttpContextAccessor();
 // Add HttpClient for Google authentication
 builder.Services.AddHttpClient();
 
+// Register HealthCheckService
+builder.Services.AddScoped<IHealthCheckService, HealthCheckService>();
+
 // Add Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -96,6 +99,7 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+
 // Seed data
 using (var scope = app.Services.CreateScope())
 {
@@ -114,3 +118,4 @@ using (var scope = app.Services.CreateScope())
 app.MapControllers();
 
 app.Run();
+
