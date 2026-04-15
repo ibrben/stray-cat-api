@@ -23,6 +23,7 @@ builder.Services.AddOpenApi();
 // Configure strongly-typed settings
 builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("Frontend"));
 builder.Services.Configure<GoogleAuthSettings>(builder.Configuration.GetSection("Authentication:Google"));
+builder.Services.Configure<R2StorageSettings>(builder.Configuration.GetSection("CloudflareR2"));
 
 // Register settings as services for injection
 builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<FrontendSettings>>().Value);
@@ -55,6 +56,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Register UrlService
 builder.Services.AddScoped<IUrlService, UrlService>();
+
+// TripImage Service
+builder.Services.AddScoped<ITripImageService, TripImageService>();
+builder.Services.AddScoped<IStorageService, R2StorageService>();
 
 // Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();

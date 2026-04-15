@@ -33,6 +33,12 @@ namespace StrayCat.Infrastructure.Data
                 entity.Property(e => e.ImageUrl).HasMaxLength(500);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                
+                // Configure relationship with Organizer
+                entity.HasOne(t => t.Organizer)
+                      .WithMany(o => o.Trips)
+                      .HasForeignKey(t => t.OrganizerId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<TripDate>(entity =>
@@ -74,12 +80,6 @@ namespace StrayCat.Infrastructure.Data
                 entity.Property(e => e.AvatarInitial).HasMaxLength(10);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-                
-                // TODO: Configure relationship with Trip after fixing build issues
-                // entity.HasOne(o => o.Trips)
-                //       .WithOne(t => t.Organizer)
-                //       .HasForeignKey(t => t.OrganizerId)
-                //       .OnDelete(DeleteBehavior.Restrict);
             });
             
             modelBuilder.Entity<Booking>(entity =>

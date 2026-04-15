@@ -12,6 +12,8 @@ namespace StrayCat.Application.Services
         Task<TripImageDto> CreateTripImageAsync(CreateTripImageDto imageDto);
         Task<bool> UpdateTripImageAsync(int id, TripImageDto imageDto);
         Task<bool> DeleteTripImageAsync(int id);
+        Task<bool> UpdateCoverImageAsync(int tripId, string cdnUrl);
+        Task<List<TripImageDto>> AddMultipleImagesAsync(MultipleImagesRequestDto request);
     }
 
     public class TripImageService : ITripImageService
@@ -79,6 +81,60 @@ namespace StrayCat.Application.Services
             _context.TripImages.Remove(image);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> UpdateCoverImageAsync(int tripId, string cdnUrl)
+        {
+            try
+            {
+                // Find the trip to update
+                var trip = await _context.Trips.FindAsync(tripId);
+                if (trip == null)
+                    return false;
+
+                // Update the trip's cover image URL
+                trip.ImageUrl = cdnUrl;
+                trip.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<List<TripImageDto>> AddMultipleImagesAsync(MultipleImagesRequestDto request)
+        {
+            var addedImages = new List<TripImageDto>();
+
+            try
+            {
+                foreach (var imageUrlDto in request.ImageUrls)
+                {
+                    var tripImage = new TripImage
+                    {
+                        TripId = request.TripId,
+                        ImageUrl = imageUrlDto.Url,
+                        DisplayOrder = imageUrlDto.DisplayOrder,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    _context.TripImages.Add(tripImage);
+                    await _context.SaveChangesAsync();
+
+                    addedImages.Add(MapToTripImageDto(tripImage));
+                }
+
+                return addedImages;
+            }
+            catch (Exception)
+            {
+                // In case of error, return what was successfully added
+                return addedImages;
+            }
         }
 
         private static TripImageDto MapToTripImageDto(TripImage tripImage)

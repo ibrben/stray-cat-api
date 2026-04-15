@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Http;
 
-namespace StrayCat.Application.Services
+namespace StrayCat.Application.Interfaces
 {
-    public interface IR2StorageService
+    public interface IStorageService
     {
-        Task<string> UploadFileAsync(IFormFile file, string fileName, string folder = "trip-images");
         Task<bool> DeleteFileAsync(string fileUrl);
         Task<string> GeneratePresignedUrlAsync(string fileName, string folder = "trip-images", TimeSpan? expiry = null);
     }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StrayCat.Application.DTOs;
 using StrayCat.Application.Services;
+using StrayCat.Application.Interfaces;
 
 namespace StrayCat.API.Controllers
 {
@@ -9,10 +10,10 @@ namespace StrayCat.API.Controllers
     public class TripImagesController : ControllerBase
     {
         private readonly ITripImageService _tripImageService;
-        private readonly IR2StorageService _r2StorageService;
+        private readonly IStorageService _r2StorageService;
         private readonly IConfiguration _configuration;
 
-        public TripImagesController(ITripImageService tripImageService, IR2StorageService r2StorageService, IConfiguration configuration)
+        public TripImagesController(ITripImageService tripImageService, IStorageService r2StorageService, IConfiguration configuration)
         {
             _tripImageService = tripImageService;
             _r2StorageService = r2StorageService;
@@ -44,9 +45,16 @@ namespace StrayCat.API.Controllers
         {
             try
             {
-                var fileName = $"{request.TripId}_{Guid.NewGuid()}{Path.GetExtension(request.FileName)}";
+                var fileName = $"{request.TripId}_{request.FileName}";
                 var presignedUrl = await _r2StorageService.GeneratePresignedUrlAsync(fileName, "trip-images");
-                var cdnUrl = $"{_configuration["CloudflareR2:CdnUrl"]}/trip-images/{fileName}";
+                var cdnUrl = $"{_configuration["CloudflareR2:CdnUrl"]}/{_configuration["CloudflareR2:BucketName"]}/trip-images/{fileName}";
+                
+                // If this is a cover image, update the trip's ImageUrl
+                if (request.IsCoverImage)
+                {
+                    var coverImageCdnUrl = cdnUrl;
+                    await _tripImageService.UpdateCoverImageAsync(request.TripId, coverImageCdnUrl);
+                }
                 
                 return Ok(new PresignedUrlResponseDto
                 {
@@ -59,6 +67,21 @@ namespace StrayCat.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, "Failed to generate presigned URL.");
+            }
+        }
+
+        // POST: api/tripimages/multiple
+        [HttpPost("multiple")]
+        public async Task<IActionResult> AddMultipleImages([FromBody] MultipleImagesRequestDto request)
+        {
+            try
+            {
+                var addedImages = await _tripImageService.AddMultipleImagesAsync(request);
+                return Ok(addedImages);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Failed to add multiple images.");
             }
         }
 

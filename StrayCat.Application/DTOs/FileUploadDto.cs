@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace StrayCat.Application.DTOs
 {
     public class FileUploadResponseDto
@@ -13,6 +15,25 @@ namespace StrayCat.Application.DTOs
     {
         public int TripId { get; set; }
         public string FileName { get; set; } = string.Empty;
+        public bool IsCoverImage { get; set; }
+    }
+
+    public class MultipleImagesRequestDto
+    {
+        [JsonPropertyName("tripId")]
+        public int TripId { get; set; }
+        
+        [JsonPropertyName("imageUrls")]
+        public List<ImageUrlDto> ImageUrls { get; set; } = new();
+    }
+
+    public class ImageUrlDto
+    {
+        [JsonPropertyName("url")]
+        public string Url { get; set; } = string.Empty;
+        
+        [JsonPropertyName("displayOrder")]
+        public int DisplayOrder { get; set; }
     }
 
     public class PresignedUrlResponseDto

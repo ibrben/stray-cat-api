@@ -22,6 +22,7 @@ namespace StrayCat.Application.Services
                 .Include(t => t.TripTags)
                 .Include(t => t.Bookings)
                 .Include(t => t.TripImages)
+                .Include(t => t.Organizer)
                 .ToListAsync();
 
             return trips.Select(MapToTripDto);
@@ -50,9 +51,9 @@ namespace StrayCat.Application.Services
                 Price = tripDto.Price,
                 ImageUrl = tripDto.ImageUrl,
                 Type = tripDto.Type,
-                Location = string.Empty,
+                Location = tripDto.Location,
                 Duration = string.Empty,
-                Currency = "USD",
+                Currency = tripDto.Currency ?? "THB",
                 IsActive = true,
                 OrganizerId = userId, // Use the authenticated user's ID
                 CreatedAt = DateTime.UtcNow,
@@ -68,8 +69,8 @@ namespace StrayCat.Application.Services
                 var tripDate = new TripDate
                 {
                     TripId = trip.Id,
-                    StartDate = tripDto.StartDate.Value,
-                    EndDate = tripDto.EndDate.Value,
+                    StartDate = tripDto.StartDate.Value.ToUniversalTime(),
+                    EndDate = tripDto.EndDate.Value.ToUniversalTime(),
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -78,17 +79,17 @@ namespace StrayCat.Application.Services
             }
 
             // Add TripTags if provided
-            foreach (var tagName in tripDto.Tags)
-            {
-                var tripTag = new TripTag
-                {
-                    TripId = trip.Id,
-                    Name = tagName,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _context.TripTags.Add(tripTag);
-            }
+            // foreach (var tagName in tripDto.Tags)
+            // {
+            //     var tripTag = new TripTag
+            //     {
+            //         TripId = trip.Id,
+            //         Name = tagName,
+            //         CreatedAt = DateTime.UtcNow,
+            //         UpdatedAt = DateTime.UtcNow
+            //     };
+            //     _context.TripTags.Add(tripTag);
+            // }
 
             await _context.SaveChangesAsync();
             return MapToTripDto(trip);
@@ -105,7 +106,7 @@ namespace StrayCat.Application.Services
                 return false;
             
             // Check if user owns this trip
-            if (existingTrip.OrganizerId != userId)
+            if (existingTrip.Organizer.Id != userId)
                 return false;
 
             existingTrip.Title = tripDto.Title;
@@ -167,7 +168,7 @@ namespace StrayCat.Application.Services
                 return false;
             
             // Check if user owns this trip
-            if (trip.OrganizerId != userId)
+            if (trip.Organizer.Id != userId)
                 return false;
 
             _context.Trips.Remove(trip);
@@ -193,10 +194,12 @@ namespace StrayCat.Application.Services
                 StartDate = firstDate?.StartDate,
                 EndDate = firstDate?.EndDate,
                 Tags = trip.TripTags.Select(t => t.Name).ToList(),
+                Location = trip.Location,
+                Currency = trip.Currency,
                 Organizer = new OrganizerDto
                 {
-                    Id = trip.OrganizerId,
-                    Name = "Default Organizer" // Placeholder until we have proper relationship
+                    Id = trip.Organizer?.Id ?? 0,
+                    Name = trip.Organizer?.Name ?? "Unknown Organizer"
                 },
                 BookedGuest = totalBookedGuests
             };

@@ -2,31 +2,33 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using StrayCat.Application.Interfaces;
+using StrayCat.Application.Settings;
 
 namespace StrayCat.Application.Services
 {
-    public class R2StorageService : IR2StorageService
+    public class R2StorageService : IStorageService
     {
         private readonly IAmazonS3 _s3Client;
         private readonly string _bucketName;
         private readonly string _baseUrl;
+        private readonly R2StorageSettings _settings;
 
-        public R2StorageService(IConfiguration configuration)
+        public R2StorageService(IOptions<R2StorageSettings> settings)
         {
-            var accessKey = configuration["CloudflareR2:AccessKeyId"];
-            var secretKey = configuration["CloudflareR2:SecretAccessKey"];
-            var serviceUrl = configuration["CloudflareR2:ServiceUrl"];
-            _bucketName = configuration["CloudflareR2:BucketName"];
-            _baseUrl = configuration["CloudflareR2:BaseUrl"];
+            _settings = settings.Value;
+            _bucketName = _settings.BucketName;
+            _baseUrl = _settings.BaseUrl;
 
             var config = new AmazonS3Config
             {
-                ServiceURL = serviceUrl,
+                ServiceURL = _settings.ServiceUrl,
                 ForcePathStyle = true,
                 AuthenticationRegion = "auto"
             };
 
-            _s3Client = new AmazonS3Client(accessKey, secretKey, config);
+            _s3Client = new AmazonS3Client(_settings.AccessKeyId, _settings.SecretAccessKey, config);
         }
 
         public async Task<string> UploadFileAsync(IFormFile file, string fileName, string folder = "trip-images")
@@ -97,7 +99,9 @@ namespace StrayCat.Application.Services
             {
                 BucketName = _bucketName,
                 Key = key,
-                Expires = DateTime.UtcNow.Add(expiry ?? TimeSpan.FromHours(1))
+                Expires = DateTime.UtcNow.Add(expiry ?? TimeSpan.FromHours(1)),
+                Verb = _settings.Verb,
+                Protocol = _settings.Protocol
             };
 
             return await _s3Client.GetPreSignedURLAsync(request);

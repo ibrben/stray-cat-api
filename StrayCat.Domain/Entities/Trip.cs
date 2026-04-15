@@ -19,6 +19,7 @@ namespace StrayCat.Domain.Entities
         public string ImageUrl { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public int OrganizerId { get; set; }
+        public Organizer Organizer { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         
@@ -27,6 +28,5 @@ namespace StrayCat.Domain.Entities
         public ICollection<TripTag> TripTags { get; set; } = new List<TripTag>();
         public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
         public ICollection<TripImage> TripImages { get; set; } = new List<TripImage>();
-        // public Organizer Organizer { get; set; } = null!; // Commented out temporarily
     }
 }
