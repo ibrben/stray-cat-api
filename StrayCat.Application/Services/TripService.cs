@@ -35,6 +35,7 @@ namespace StrayCat.Application.Services
                 .Include(t => t.TripTags)
                 .Include(t => t.Bookings)
                 .Include(t => t.TripImages)
+                .Include(t => t.Organizer)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             return trip != null ? MapToTripDto(trip) : null;

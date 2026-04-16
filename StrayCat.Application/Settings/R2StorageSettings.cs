@@ -10,6 +10,6 @@ namespace StrayCat.Application.Settings
         public string BucketName { get; set; } = string.Empty;
         public string BaseUrl { get; set; } = string.Empty;
         public HttpVerb Verb { get; set; } = HttpVerb.PUT;
-        public Protocol Protocol { get; set; } = Protocol.HTTP;
+        public Protocol Protocol { get; set; } = Protocol.HTTPS;
     }
 }

@@ -47,7 +47,7 @@ namespace StrayCat.API.Controllers
             {
                 var fileName = $"{request.TripId}_{request.FileName}";
                 var presignedUrl = await _r2StorageService.GeneratePresignedUrlAsync(fileName, "trip-images");
-                var cdnUrl = $"{_configuration["CloudflareR2:CdnUrl"]}/{_configuration["CloudflareR2:BucketName"]}/trip-images/{fileName}";
+                var cdnUrl = $"{_configuration["CloudflareR2:CdnUrl"]}/trip-images/{fileName}";
                 
                 // If this is a cover image, update the trip's ImageUrl
                 if (request.IsCoverImage)
