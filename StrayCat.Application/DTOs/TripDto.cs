@@ -48,6 +48,9 @@ namespace StrayCat.Application.DTOs
         public string Location { get; set; }
         [JsonPropertyName("currency")]
         public string Currency { get; set; } = "THB";
+        
+        [JsonPropertyName("highlights")]
+        public List<string> Highlights { get; set; } = new();
     }
 
     public class OrganizerDto

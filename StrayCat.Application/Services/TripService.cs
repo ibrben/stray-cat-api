@@ -22,6 +22,7 @@ namespace StrayCat.Application.Services
                 .Include(t => t.TripTags)
                 .Include(t => t.Bookings)
                 .Include(t => t.TripImages)
+                .Include(t => t.Highlights)
                 .Include(t => t.Organizer)
                 .ToListAsync();
 
@@ -35,6 +36,7 @@ namespace StrayCat.Application.Services
                 .Include(t => t.TripTags)
                 .Include(t => t.Bookings)
                 .Include(t => t.TripImages)
+                .Include(t => t.Highlights)
                 .Include(t => t.Organizer)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
@@ -79,18 +81,18 @@ namespace StrayCat.Application.Services
                 _context.TripDates.Add(tripDate);
             }
 
-            // Add TripTags if provided
-            // foreach (var tagName in tripDto.Tags)
-            // {
-            //     var tripTag = new TripTag
-            //     {
-            //         TripId = trip.Id,
-            //         Name = tagName,
-            //         CreatedAt = DateTime.UtcNow,
-            //         UpdatedAt = DateTime.UtcNow
-            //     };
-            //     _context.TripTags.Add(tripTag);
-            // }
+            // Add Highlights if provided
+            foreach (var highlightDto in tripDto.Highlights)
+            {
+                var highlight = new Highlight
+                {
+                    TripId = trip.Id,
+                    Item = highlightDto,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.Highlights.Add(highlight);
+            }
 
             await _context.SaveChangesAsync();
             return MapToTripDto(trip);
@@ -101,6 +103,7 @@ namespace StrayCat.Application.Services
             var existingTrip = await _context.Trips
                 .Include(t => t.TripDates)
                 .Include(t => t.TripTags)
+                .Include(t => t.Highlights)
                 .FirstOrDefaultAsync(t => t.Id == id);
             
             if (existingTrip == null)
@@ -158,6 +161,20 @@ namespace StrayCat.Application.Services
                 _context.TripTags.Add(tripTag);
             }
 
+            // Update Highlights
+            _context.Highlights.RemoveRange(existingTrip.Highlights);
+            foreach (var highlight in tripDto.Highlights)
+            {
+                var highlightEntity = new Highlight
+                {
+                    TripId = existingTrip.Id,
+                    Item = highlight,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.Highlights.Add(highlightEntity);
+            }
+
             await _context.SaveChangesAsync();
             return true;
         }
@@ -197,6 +214,7 @@ namespace StrayCat.Application.Services
                 Tags = trip.TripTags.Select(t => t.Name).ToList(),
                 Location = trip.Location,
                 Currency = trip.Currency,
+                Highlights = trip.Highlights.Select(h => h.Item).ToList(),
                 Organizer = new OrganizerDto
                 {
                     Id = trip.Organizer?.Id ?? 0,

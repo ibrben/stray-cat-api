@@ -15,6 +15,7 @@ namespace StrayCat.Infrastructure.Data
         public DbSet<Organizer> Organizers { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<TripImage> TripImages { get; set; }
+        public DbSet<Highlight> Highlights { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -117,6 +118,21 @@ namespace StrayCat.Infrastructure.Data
                 entity.HasOne(ti => ti.Trip)
                       .WithMany(t => t.TripImages)
                       .HasForeignKey(ti => ti.TripId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+            
+            modelBuilder.Entity<Highlight>(entity =>
+            {
+                entity.ToTable("highlights");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Item).IsRequired().HasMaxLength(500);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                
+                // Configure relationship with Trip
+                entity.HasOne(h => h.Trip)
+                      .WithMany(t => t.Highlights)
+                      .HasForeignKey(h => h.TripId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
         }

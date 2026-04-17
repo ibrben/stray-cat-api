@@ -125,8 +125,8 @@ namespace StrayCat.API.Controllers
                 
                 if (response == null){
 
-                    Console.WriteLine("Google authentication failed. User may not exist or be inactive.");
-                    return Unauthorized("Google authentication failed. User may not exist or be inactive.");
+                    var errorUrl = _urlService.BuildErrorUrl("User not found or inactivated");
+                return Redirect(errorUrl);
                 }
 
                 // Redirect to frontend with token

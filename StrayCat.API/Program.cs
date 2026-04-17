@@ -47,6 +47,9 @@ builder.Services.AddDbContext<StrayCatDbContext>(options =>
 // Register TripService
 builder.Services.AddScoped<ITripService, TripService>();
 
+// Register HighlightService
+builder.Services.AddScoped<IHighlightService, HighlightService>();
+
 // Register Booking services
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IReferenceCodeGenerator, ReferenceCodeGenerator>();
