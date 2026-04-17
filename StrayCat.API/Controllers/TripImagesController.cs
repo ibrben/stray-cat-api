@@ -54,6 +54,14 @@ namespace StrayCat.API.Controllers
                 {
                     var coverImageCdnUrl = cdnUrl;
                     await _tripImageService.UpdateCoverImageAsync(request.TripId, coverImageCdnUrl);
+                    await _tripImageService.CreateTripImageAsync(
+                        new CreateTripImageDto
+                        {
+                            TripId = request.TripId,
+                            ImageUrl = coverImageCdnUrl,
+                            DisplayOrder = 0 
+                        }
+                    );
                 }
                 
                 return Ok(new PresignedUrlResponseDto
