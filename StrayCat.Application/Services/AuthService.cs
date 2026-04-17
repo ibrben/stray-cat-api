@@ -188,7 +188,19 @@ namespace StrayCat.Application.Services
                     .FirstOrDefaultAsync(o => o.Email.ToLower() == payload.Email.ToLower());
 
                 if (user == null)
+                {
+                    user = new Organizer
+                    {
+                        Email = payload.Email,
+                        Name = payload.Name,
+                        ProfilePictureUrl = payload.Picture,
+                        IsActive = false
+                    };
+                    _context.Organizers.Add(user);
+                    await _context.SaveChangesAsync();
                     return null; // User doesn't exist - return 401
+                }
+                    
 
                 // Check if user is active
                 if (!user.IsActive)
