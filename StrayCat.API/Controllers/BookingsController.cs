@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using StrayCat.Application.DTOs;
 using StrayCat.Application.Services;
+using System.Security.Claims;
 
 namespace StrayCat.API.Controllers
 {
@@ -17,9 +19,20 @@ namespace StrayCat.API.Controllers
 
         // GET: api/bookings
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetBookings()
         {
-            var bookings = await _bookingService.GetAllBookingsAsync();
+            // Get current user ID and email from claims
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var userEmailClaim = User.FindFirst(ClaimTypes.Email);
+            
+            if (userIdClaim == null || userEmailClaim == null)
+                return Unauthorized("User not found in token.");
+
+            var userId = int.Parse(userIdClaim.Value);
+            var userEmail = userEmailClaim.Value;
+            
+            var bookings = await _bookingService.GetBookingsForUserAsync(userId, userEmail);
             return Ok(bookings);
         }
 

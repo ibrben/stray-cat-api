@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using StrayCat.Application.DTOs;
 using StrayCat.Domain.Entities;
 using StrayCat.Infrastructure.Data;
@@ -14,17 +15,20 @@ namespace StrayCat.Application.Services
         Task<bool> UpdateBookingAsync(int id, BookingDto bookingDto);
         Task<bool> DeleteBookingAsync(int id);
         Task<IEnumerable<BookingDto>> GetBookingsByTripIdAsync(int tripId);
+        Task<IEnumerable<BookingDto>> GetBookingsForUserAsync(int userId, string userEmail);
     }
 
     public class BookingService : IBookingService
     {
         private readonly StrayCatDbContext _context;
         private readonly IReferenceCodeGenerator _referenceCodeGenerator;
+        private readonly IConfiguration _configuration;
 
-        public BookingService(StrayCatDbContext context, IReferenceCodeGenerator referenceCodeGenerator)
+        public BookingService(StrayCatDbContext context, IReferenceCodeGenerator referenceCodeGenerator, IConfiguration configuration)
         {
             _context = context;
             _referenceCodeGenerator = referenceCodeGenerator;
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<BookingDto>> GetAllBookingsAsync()
@@ -139,6 +143,36 @@ namespace StrayCat.Application.Services
                 .Where(b => b.TripId == tripId)
                 .ToListAsync();
 
+            return bookings.Select(MapToBookingDto);
+        }
+
+        public async Task<IEnumerable<BookingDto>> GetBookingsForUserAsync(int userId, string userEmail)
+        {
+            // Get admin email list from configuration
+            var adminEmails = _configuration.GetSection("AdminSettings:AdminEmails").Get<List<string>>() ?? new List<string>();
+            
+            // Check if user is admin
+            var isAdmin = adminEmails.Contains(userEmail, StringComparer.OrdinalIgnoreCase);
+            
+            IQueryable<Booking> query;
+            
+            if (isAdmin)
+            {
+                // Admin can see all bookings
+                query = _context.Bookings
+                    .Include(b => b.Trip)
+                    .ThenInclude(t => t.Organizer);
+            }
+            else
+            {
+                // Organizer can only see bookings for their own trips
+                query = _context.Bookings
+                    .Include(b => b.Trip)
+                    .ThenInclude(t => t.Organizer)
+                    .Where(b => b.Trip.OrganizerId == userId);
+            }
+            
+            var bookings = await query.ToListAsync();
             return bookings.Select(MapToBookingDto);
         }
 
