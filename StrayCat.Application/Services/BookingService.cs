@@ -90,9 +90,9 @@ namespace StrayCat.Application.Services
                 CustomerEmail = bookingDto.CustomerEmail,
                 GuestCount = bookingDto.GuestCount,
                 Notes = bookingDto.Notes,
-                TotalPrice = bookingDto.TotalPrice,
+                TotalPrice = bookingDto.TotalPrice - bookingDto.ServiceFee,
                 ServiceFee = bookingDto.ServiceFee,
-                GrandTotal = bookingDto.TotalPrice + bookingDto.ServiceFee,
+                GrandTotal = bookingDto.TotalPrice,
                 Status = "Confirmed",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
