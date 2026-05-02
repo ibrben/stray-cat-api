@@ -58,6 +58,7 @@ namespace StrayCat.Application.Services
                 Duration = string.Empty,
                 Currency = tripDto.Currency ?? "THB",
                 IsActive = true,
+                IsPublished = tripDto.IsPublished, // New trips are not published by default
                 OrganizerId = userId, // Use the authenticated user's ID
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -110,8 +111,12 @@ namespace StrayCat.Application.Services
                 return false;
             
             // Check if user owns this trip
-            if (existingTrip.Organizer.Id != userId)
+            if (existingTrip.OrganizerId != userId)
                 return false;
+            
+            // Check if trip is published - if so, prevent updates
+            // if (existingTrip.IsPublished)
+            //     throw new InvalidOperationException("Cannot update a published trip. Please unpublish the trip first.");
 
             existingTrip.Title = tripDto.Title;
             existingTrip.Description = tripDto.Description;
@@ -128,8 +133,8 @@ namespace StrayCat.Application.Services
                 var existingDate = existingTrip.TripDates.FirstOrDefault();
                 if (existingDate != null)
                 {
-                    existingDate.StartDate = tripDto.StartDate.Value;
-                    existingDate.EndDate = tripDto.EndDate.Value;
+                    existingDate.StartDate = tripDto.StartDate.Value.ToUniversalTime();
+                    existingDate.EndDate = tripDto.EndDate.Value.ToUniversalTime();
                     existingDate.UpdatedAt = DateTime.UtcNow;
                 }
                 else
@@ -148,18 +153,18 @@ namespace StrayCat.Application.Services
             }
 
             // Update TripTags
-            _context.TripTags.RemoveRange(existingTrip.TripTags);
-            foreach (var tagName in tripDto.Tags)
-            {
-                var tripTag = new TripTag
-                {
-                    TripId = existingTrip.Id,
-                    Name = tagName,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _context.TripTags.Add(tripTag);
-            }
+            // _context.TripTags.RemoveRange(existingTrip.TripTags);
+            // foreach (var tagName in tripDto.Tags)
+            // {
+            //     var tripTag = new TripTag
+            //     {
+            //         TripId = existingTrip.Id,
+            //         Name = tagName,
+            //         CreatedAt = DateTime.UtcNow,
+            //         UpdatedAt = DateTime.UtcNow
+            //     };
+            //     _context.TripTags.Add(tripTag);
+            // }
 
             // Update Highlights
             _context.Highlights.RemoveRange(existingTrip.Highlights);
@@ -194,6 +199,48 @@ namespace StrayCat.Application.Services
             return true;
         }
 
+        public async Task<PublishTripResponseDto> PublishTripAsync(PublishTripRequestDto request, int userId)
+        {
+            var trip = await _context.Trips
+                .Include(t => t.Organizer)
+                .FirstOrDefaultAsync(t => t.Id == request.TripId);
+            
+            if (trip == null)
+            {
+                return new PublishTripResponseDto
+                {
+                    TripId = request.TripId,
+                    IsPublished = false,
+                    Message = "Trip not found"
+                };
+            }
+            
+            // Check if user owns this trip
+            if (trip.Organizer.Id != userId)
+            {
+                return new PublishTripResponseDto
+                {
+                    TripId = request.TripId,
+                    IsPublished = trip.IsPublished,
+                    Message = "You don't have permission to modify this trip"
+                };
+            }
+            
+            // Update the published state
+            trip.IsPublished = request.State;
+            trip.UpdatedAt = DateTime.UtcNow;
+            
+            await _context.SaveChangesAsync();
+            
+            var action = request.State ? "published" : "unpublished";
+            return new PublishTripResponseDto
+            {
+                TripId = trip.Id,
+                IsPublished = trip.IsPublished,
+                Message = $"Trip successfully {action}"
+            };
+        }
+
         private static TripDto MapToTripDto(Trip trip)
         {
             var firstDate = trip.TripDates.FirstOrDefault();
@@ -215,6 +262,7 @@ namespace StrayCat.Application.Services
                 Location = trip.Location,
                 Currency = trip.Currency,
                 Highlights = trip.Highlights.Select(h => h.Item).ToList(),
+                IsPublished = trip.IsPublished,
                 Organizer = new OrganizerDto
                 {
                     Id = trip.Organizer?.Id ?? 0,

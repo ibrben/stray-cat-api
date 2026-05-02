@@ -9,5 +9,6 @@ namespace StrayCat.Application.Interfaces
         Task<TripDto> CreateTripAsync(TripDto trip, int userId);
         Task<bool> UpdateTripAsync(int id, TripDto trip, int userId);
         Task<bool> DeleteTripAsync(int id, int userId);
+        Task<PublishTripResponseDto> PublishTripAsync(PublishTripRequestDto request, int userId);
     }
 }

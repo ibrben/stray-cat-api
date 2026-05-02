@@ -18,6 +18,7 @@ namespace StrayCat.Domain.Entities
         public TripType Type { get; set; } = TripType.Trip;
         public string ImageUrl { get; set; } = string.Empty;
         public bool IsActive { get; set; }
+        public bool IsPublished { get; set; }
         public int OrganizerId { get; set; }
         public Organizer Organizer { get; set; } = null!;
         public DateTime CreatedAt { get; set; }

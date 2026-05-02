@@ -63,10 +63,17 @@ namespace StrayCat.API.Controllers
 
             var userId = int.Parse(userIdClaim.Value);
             
-            var result = await _tripService.UpdateTripAsync(id, trip, userId);
-            if (!result)
-                return NotFound();
-            return NoContent();
+            try
+            {
+                var result = await _tripService.UpdateTripAsync(id, trip, userId);
+                if (!result)
+                    return NotFound();
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // DELETE: api/trips/{id}
@@ -85,6 +92,31 @@ namespace StrayCat.API.Controllers
             if (!result)
                 return NotFound();
             return NoContent();
+        }
+
+        // POST: api/trips/publish
+        [HttpPost("publish")]
+        [Authorize]
+        public async Task<IActionResult> PublishTrip([FromBody] PublishTripRequestDto request)
+        {
+            // Get current user ID from claims
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized("User not found in token.");
+
+            var userId = int.Parse(userIdClaim.Value);
+            
+            var result = await _tripService.PublishTripAsync(request, userId);
+            
+            // Check if there was an error
+            if (result.Message.Contains("not found") || result.Message.Contains("permission"))
+            {
+                if (result.Message.Contains("not found"))
+                    return NotFound(result.Message);
+                return BadRequest(result.Message);
+            }
+            
+            return Ok(result);
         }
     }
 }

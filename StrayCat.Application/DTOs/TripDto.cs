@@ -51,6 +51,9 @@ namespace StrayCat.Application.DTOs
         
         [JsonPropertyName("highlights")]
         public List<string> Highlights { get; set; } = new();
+        
+        [JsonPropertyName("isPublished")]
+        public bool IsPublished { get; set; } = true;
     }
 
     public class OrganizerDto

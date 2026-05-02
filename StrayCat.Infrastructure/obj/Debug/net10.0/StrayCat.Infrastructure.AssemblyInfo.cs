@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StrayCat.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+325135f1495bf486a720a28ac189f5a5564da5e3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3fd92240767aeac48cd0ae35431d894c402aa212")]
 [assembly: System.Reflection.AssemblyProductAttribute("StrayCat.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StrayCat.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

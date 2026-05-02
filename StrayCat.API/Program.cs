@@ -73,6 +73,9 @@ builder.Services.AddHttpClient();
 // Register HealthCheckService
 builder.Services.AddScoped<IHealthCheckService, HealthCheckService>();
 
+// Register LINE messaging service
+builder.Services.AddScoped<ILineMessagingService, LineMessagingService>();
+
 // Add Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
