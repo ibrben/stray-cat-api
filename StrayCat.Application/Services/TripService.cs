@@ -123,7 +123,7 @@ namespace StrayCat.Application.Services
             existingTrip.Category = tripDto.Category;
             existingTrip.MaxGuests = tripDto.MaxGuests;
             existingTrip.Price = tripDto.Price;
-            existingTrip.ImageUrl = tripDto.ImageUrl;
+            existingTrip.ImageUrl = tripDto.ImageUrl?? existingTrip.ImageUrl;
             existingTrip.Type = tripDto.Type;
             existingTrip.UpdatedAt = DateTime.UtcNow;
 

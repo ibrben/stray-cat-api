@@ -16,6 +16,8 @@ namespace StrayCat.Application.DTOs
         public string Status { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public string? PaymentIntentClientSecret { get; set; }
+        public string? IdCard { get; set; }
         
         // Trip details for response
         public TripSummaryDto? Trip { get; set; }
@@ -31,6 +33,13 @@ namespace StrayCat.Application.DTOs
         public string Notes { get; set; } = string.Empty;
         public decimal TotalPrice { get; set; }
         public decimal ServiceFee { get; set; }
+        public string? customerIDCard { get; set; }
+    }
+
+    public class CreateBookingResponse
+    {
+        public BookingDto Booking { get; set; } = null!;
+        public string PaymentIntentClientSecret { get; set; } = string.Empty;
     }
 
     public class TripSummaryDto

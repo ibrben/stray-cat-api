@@ -76,6 +76,9 @@ builder.Services.AddScoped<IHealthCheckService, HealthCheckService>();
 // Register LINE messaging service
 builder.Services.AddScoped<ILineMessagingService, LineMessagingService>();
 
+// Register payment service
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+
 // Add Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

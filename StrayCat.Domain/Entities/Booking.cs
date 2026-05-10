@@ -51,6 +51,15 @@ namespace StrayCat.Domain.Entities
         
         public DateTime UpdatedAt { get; set; }
         
+        [StringLength(255)]
+        public string? PaymentIntentClientSecret { get; set; }
+        
+        [StringLength(20)]
+        public string? IdCard { get; set; }
+        
+        [StringLength(100)]
+        public string? PaymentConfirmationId { get; set; }
+        
         // Navigation property for Trip
         public Trip Trip { get; set; } = null!;
     }

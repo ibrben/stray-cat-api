@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using StrayCat.Application.Common;
 using StrayCat.Application.DTOs;
+using StrayCat.Application.Interfaces;
 using StrayCat.Domain.Entities;
 using StrayCat.Infrastructure.Data;
 
@@ -11,11 +13,12 @@ namespace StrayCat.Application.Services
         Task<IEnumerable<BookingDto>> GetAllBookingsAsync();
         Task<BookingDto?> GetBookingByIdAsync(int id);
         Task<BookingDto?> GetBookingByReferenceCodeAsync(string referenceCode);
-        Task<BookingDto> CreateBookingAsync(CreateBookingDto bookingDto);
+        Task<CreateBookingResponse> CreateBookingAsync(CreateBookingDto bookingDto);
         Task<bool> UpdateBookingAsync(int id, BookingDto bookingDto);
         Task<bool> DeleteBookingAsync(int id);
         Task<IEnumerable<BookingDto>> GetBookingsByTripIdAsync(int tripId);
         Task<IEnumerable<BookingDto>> GetBookingsForUserAsync(int userId, string userEmail);
+        Task<bool> ConfirmPaymentAsync(string confirmationId, int bookingId, string referenceCode);
     }
 
     public class BookingService : IBookingService
@@ -23,12 +26,14 @@ namespace StrayCat.Application.Services
         private readonly StrayCatDbContext _context;
         private readonly IReferenceCodeGenerator _referenceCodeGenerator;
         private readonly IConfiguration _configuration;
+        private readonly IPaymentService _paymentService;
 
-        public BookingService(StrayCatDbContext context, IReferenceCodeGenerator referenceCodeGenerator, IConfiguration configuration)
+        public BookingService(StrayCatDbContext context, IReferenceCodeGenerator referenceCodeGenerator, IConfiguration configuration, IPaymentService paymentService)
         {
             _context = context;
             _referenceCodeGenerator = referenceCodeGenerator;
             _configuration = configuration;
+            _paymentService = paymentService;
         }
 
         public async Task<IEnumerable<BookingDto>> GetAllBookingsAsync()
@@ -58,7 +63,7 @@ namespace StrayCat.Application.Services
             return booking != null ? MapToBookingDto(booking) : null;
         }
 
-        public async Task<BookingDto> CreateBookingAsync(CreateBookingDto bookingDto)
+        public async Task<CreateBookingResponse> CreateBookingAsync(CreateBookingDto bookingDto)
         {
             // Check if trip exists and has available slots
             var trip = await _context.Trips
@@ -81,6 +86,9 @@ namespace StrayCat.Application.Services
                 referenceCode = _referenceCodeGenerator.GenerateReferenceCode();
             } while (await _context.Bookings.AnyAsync(b => b.ReferenceCode == referenceCode));
 
+            // Create payment intent
+            var paymentIntentClientSecret = await _paymentService.CreatePaymentIntentAsync(bookingDto.TotalPrice, "thb");
+
             var booking = new Booking
             {
                 TripId = bookingDto.TripId,
@@ -93,15 +101,23 @@ namespace StrayCat.Application.Services
                 TotalPrice = bookingDto.TotalPrice - bookingDto.ServiceFee,
                 ServiceFee = bookingDto.ServiceFee,
                 GrandTotal = bookingDto.TotalPrice,
-                Status = "Confirmed",
+                Status = BookingStatus.WaitingForPayment,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
+                PaymentIntentClientSecret = paymentIntentClientSecret,
+                IdCard = bookingDto.customerIDCard
             };
 
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
 
-            return await GetBookingByIdAsync(booking.Id);
+            var createdBookingDto = await GetBookingByIdAsync(booking.Id);
+            
+            return new CreateBookingResponse
+            {
+                Booking = createdBookingDto!,
+                PaymentIntentClientSecret = paymentIntentClientSecret
+            };
         }
 
         public async Task<bool> UpdateBookingAsync(int id, BookingDto bookingDto)
@@ -134,6 +150,57 @@ namespace StrayCat.Application.Services
             _context.Bookings.Remove(booking);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> ConfirmPaymentAsync(string confirmationId, int bookingId, string referenceCode)
+        {
+            try
+            {
+                var booking = await _context.Bookings
+                    .FirstOrDefaultAsync(b => b.Id == bookingId && b.ReferenceCode == referenceCode);
+
+                if (booking == null)
+                {
+                    Console.WriteLine($"Booking not found with ID: {bookingId} and reference code: {referenceCode}");
+                    return false;
+                }
+
+                // Check if booking status is "Waiting for Payment"
+                if (booking.Status != BookingStatus.WaitingForPayment)
+                {
+                    Console.WriteLine($"Booking status is not waiting for payment. Current status: {booking.Status}");
+                    return false;
+                }
+
+                // Check if paymentIntentClientSecret exists
+                if (string.IsNullOrEmpty(booking.PaymentIntentClientSecret))
+                {
+                    Console.WriteLine($"Payment intent client secret is missing for booking ID: {bookingId}");
+                    return false;
+                }
+
+                // Verify payment with Stripe first
+                var paymentConfirmed = await _paymentService.ConfirmPaymentAsync(confirmationId, bookingId, referenceCode);
+                if (!paymentConfirmed)
+                {
+                    Console.WriteLine($"Payment verification failed for confirmation ID: {confirmationId}");
+                    return false;
+                }
+
+                // Update booking status and store confirmation ID
+                booking.Status = BookingStatus.Confirmed;
+                booking.PaymentConfirmationId = confirmationId;
+                booking.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"Payment confirmed successfully for booking ID: {bookingId}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error confirming payment: {ex.Message}");
+                return false;
+            }
         }
 
         public async Task<IEnumerable<BookingDto>> GetBookingsByTripIdAsync(int tripId)
@@ -194,6 +261,8 @@ namespace StrayCat.Application.Services
                 Status = booking.Status,
                 CreatedAt = booking.CreatedAt,
                 UpdatedAt = booking.UpdatedAt,
+                PaymentIntentClientSecret = booking.PaymentIntentClientSecret,
+                IdCard = booking.IdCard,
                 Trip = booking.Trip != null ? new TripSummaryDto
                 {
                     TripId = booking.Trip.Id,

@@ -73,7 +73,7 @@ namespace StrayCat.API.Controllers
             try
             {
                 var booking = await _bookingService.CreateBookingAsync(bookingDto);
-                return CreatedAtAction(nameof(GetBooking), new { id = booking.Id }, booking);
+                return CreatedAtAction(nameof(GetBooking), new { id = booking.Booking.Id }, booking);
             }
             catch (ArgumentException ex)
             {

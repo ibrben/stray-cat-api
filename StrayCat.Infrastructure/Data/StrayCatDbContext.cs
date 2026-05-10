@@ -95,6 +95,8 @@ namespace StrayCat.Infrastructure.Data
                 entity.Property(e => e.ReferenceCode).IsRequired().HasMaxLength(7).IsFixedLength();
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.IdCard).HasMaxLength(20);
+                entity.Property(e => e.PaymentConfirmationId).HasMaxLength(100);
                 
                 // Add unique constraint for ReferenceCode
                 entity.HasIndex(e => e.ReferenceCode).IsUnique();
