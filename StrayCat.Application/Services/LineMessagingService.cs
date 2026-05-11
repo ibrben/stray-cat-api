@@ -12,6 +12,7 @@ public class LineMessagingService : ILineMessagingService
     private readonly HttpClient _httpClient;
     private readonly string _channelAccessToken;
     private readonly string _toUserId;
+    private readonly string _toGroupId;
 
     public LineMessagingService(IConfiguration configuration, HttpClient httpClient)
     {
@@ -19,16 +20,18 @@ public class LineMessagingService : ILineMessagingService
         _httpClient = httpClient;
         _channelAccessToken = _configuration["LineMessaging:ChannelAccessToken"] ?? throw new ArgumentNullException("LineMessaging:ChannelAccessToken");
         _toUserId = _configuration["LineMessaging:ToUserId"] ?? throw new ArgumentNullException("LineMessaging:ToUserId");
+        _toGroupId = _configuration["LineMessaging:ToGroupId"] ?? throw new ArgumentNullException("LineMessaging:ToGroupId");
     }
 
-    public async Task<bool> SendDownloadNotificationAsync(string msg)
+    public async Task<bool> SendDownloadNotificationAsync(string msg, string? destination)
     {  
         msg = msg?? "There is download occur on your page.";
+        string to = destination?? _toUserId;
         try
         {
             var messagePayload = new
             {
-                to = _toUserId,
+                to = to,
                 messages = new[]
                 {
                     new
@@ -70,8 +73,8 @@ public class LineMessagingService : ILineMessagingService
 
             foreach (var webhookEvent in webhookRequest.Events)
             {
-                string msg = $"User ID: {webhookEvent.Source.UserId}, Msg: {webhookEvent.Message?.Text}";
-                await SendDownloadNotificationAsync(msg);
+                string msg = $"Destination: {webhookRequest.Destination}, Msg: {webhookEvent.Message?.Text}";
+                await SendDownloadNotificationAsync(msg, _toGroupId);
                 await ProcessWebhookEvent(webhookEvent);
             }
 
