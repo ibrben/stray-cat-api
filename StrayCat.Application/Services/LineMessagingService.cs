@@ -73,9 +73,11 @@ public class LineMessagingService : ILineMessagingService
 
             foreach (var webhookEvent in webhookRequest.Events)
             {
+                string json = JsonSerializer.Serialize(webhookRequest);
+                Console.WriteLine($"Webhook request body: {json}");
                 string msg = $"Destination: {webhookRequest.Destination}, Msg: {webhookEvent.Message?.Text}";
                 await SendDownloadNotificationAsync(msg, _toGroupId);
-                await ProcessWebhookEvent(webhookEvent);
+                // await ProcessWebhoxokEvent(webhookEvent);
             }
 
             return true;
