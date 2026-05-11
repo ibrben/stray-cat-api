@@ -28,4 +28,36 @@ public class MessageController : ControllerBase
             return StatusCode(500, new { message = "Failed to send download notification" });
         }
     }
+
+    [HttpPost("webhook")]
+    public async Task<IActionResult> Webhook([FromBody] LineWebhookRequest webhookRequest)
+    {
+        try
+        {
+            if (webhookRequest == null)
+            {
+                return BadRequest(new { message = "Invalid webhook request" });
+            }
+
+            var success = await _lineMessagingService.ProcessWebhookAsync(webhookRequest);
+            
+            if (success)
+            {
+                return Ok(new { message = "Webhook processed successfully" });
+            }
+            else
+            {
+                return StatusCode(500, new { message = "Failed to process webhook" });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error processing webhook: {ex.Message}");
+            return StatusCode(500, new { message = "Failed to process webhook" });
+        }
+        finally
+        {
+            return Ok(new { message = "Webhook processing completed" });
+        }
+    }
 }
