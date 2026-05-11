@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StrayCat.Application.Interfaces;
+using StrayCat.Application.DTOs;
 
 namespace StrayCat.API.Controllers;
 
@@ -17,7 +18,7 @@ public class MessageController : ControllerBase
     [HttpGet("download")]
     public async Task<IActionResult> Download()
     {
-        var success = await _lineMessagingService.SendDownloadNotificationAsync();
+        var success = await _lineMessagingService.SendDownloadNotificationAsync("Download notification sent successfully");
         
         if (success)
         {
@@ -55,9 +56,7 @@ public class MessageController : ControllerBase
             Console.WriteLine($"Error processing webhook: {ex.Message}");
             return StatusCode(500, new { message = "Failed to process webhook" });
         }
-        finally
-        {
-            return Ok(new { message = "Webhook processing completed" });
-        }
+        
+        return Ok(new { message = "Webhook processing completed" });
     }
 }

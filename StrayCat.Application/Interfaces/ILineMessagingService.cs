@@ -1,3 +1,5 @@
+using StrayCat.Application.DTOs;
+
 namespace StrayCat.Application.Interfaces;
 
 public interface ILineMessagingService
