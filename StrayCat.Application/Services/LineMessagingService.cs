@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using StrayCat.Application.Interfaces;
+using StrayCat.Application.DTOs;
 
 namespace StrayCat.Application.Services;
 
