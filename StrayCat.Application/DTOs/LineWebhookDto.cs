@@ -21,7 +21,7 @@ public class LineWebhookSource
 {
     public string Type { get; set; } = string.Empty;
     public string UserId { get; set; } = string.Empty;
-    public string? GroupId { get; set; } = string.Empty;
+    public string GroupId { get; set; } = string.Empty;
 }
 
 public class LineWebhookMessage

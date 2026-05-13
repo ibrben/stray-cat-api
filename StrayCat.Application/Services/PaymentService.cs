@@ -18,15 +18,24 @@ public class PaymentService : IPaymentService
     {
         try
         {
+            var paymentMethod = _configuration.GetSection("Payment:Method")
+                .GetChildren()
+                .Select(c => c.Value)
+                .ToList();
+
+            if (paymentMethod.Count == 0)
+            {
+                throw new InvalidOperationException("Payment method not configured properly");
+            }
             var options = new PaymentIntentCreateOptions
             {
                 Amount = (long)(amount*100), // Stripe expects amount in cents
                 Currency = currency,
-                // PaymentMethodTypes = new List<string> { "promptpay","creditcard" },
-                AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
-                {
-                    Enabled = true,
-                },
+                PaymentMethodTypes = paymentMethod,
+                // AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+                // {
+                //     Enabled = false,
+                // },
             };
 
             var service = new PaymentIntentService();
