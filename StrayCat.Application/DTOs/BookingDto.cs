@@ -40,6 +40,7 @@ namespace StrayCat.Application.DTOs
     {
         public BookingDto Booking { get; set; } = null!;
         public string PaymentIntentClientSecret { get; set; } = string.Empty;
+        public string PaymentUrl { get; set; } = string.Empty;
     }
 
     public class TripSummaryDto

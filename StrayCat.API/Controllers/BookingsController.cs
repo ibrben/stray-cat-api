@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using StrayCat.Application.DTOs;
+using StrayCat.Application.Interfaces;
 using StrayCat.Application.Services;
 using System.Security.Claims;
 
