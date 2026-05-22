@@ -6,34 +6,23 @@ using StrayCat.Application.Interfaces;
 using StrayCat.Domain.Entities;
 using StrayCat.Infrastructure.Data;
 
-namespace StrayCat.Application.Services
-{
-    public interface IBookingService
-    {
-        Task<IEnumerable<BookingDto>> GetAllBookingsAsync();
-        Task<BookingDto?> GetBookingByIdAsync(int id);
-        Task<BookingDto?> GetBookingByReferenceCodeAsync(string referenceCode);
-        Task<CreateBookingResponse> CreateBookingAsync(CreateBookingDto bookingDto);
-        Task<bool> UpdateBookingAsync(int id, BookingDto bookingDto);
-        Task<bool> DeleteBookingAsync(int id);
-        Task<IEnumerable<BookingDto>> GetBookingsByTripIdAsync(int tripId);
-        Task<IEnumerable<BookingDto>> GetBookingsForUserAsync(int userId, string userEmail);
-        Task<bool> ConfirmPaymentAsync(string confirmationId, int bookingId, string referenceCode);
-    }
+namespace StrayCat.Application.Services;
 
-    public class BookingService : IBookingService
+public class BookingService : IBookingService
     {
         private readonly StrayCatDbContext _context;
         private readonly IReferenceCodeGenerator _referenceCodeGenerator;
         private readonly IConfiguration _configuration;
         private readonly IPaymentService _paymentService;
+        private readonly ILineMessagingService _lineMessagingService;
 
-        public BookingService(StrayCatDbContext context, IReferenceCodeGenerator referenceCodeGenerator, IConfiguration configuration, IPaymentService paymentService)
+        public BookingService(StrayCatDbContext context, IReferenceCodeGenerator referenceCodeGenerator, IConfiguration configuration, IPaymentService paymentService, ILineMessagingService lineMessagingService)
         {
             _context = context;
             _referenceCodeGenerator = referenceCodeGenerator;
             _configuration = configuration;
             _paymentService = paymentService;
+            _lineMessagingService = lineMessagingService;
         }
 
         public async Task<IEnumerable<BookingDto>> GetAllBookingsAsync()
@@ -63,12 +52,12 @@ namespace StrayCat.Application.Services
             return booking != null ? MapToBookingDto(booking) : null;
         }
 
-        public async Task<CreateBookingResponse> CreateBookingAsync(CreateBookingDto bookingDto)
+        public async Task<CreateBookingResponse> CreateBookingAsync(CreateBookingDto createBookingDto)
         {
             // Check if trip exists and has available slots
             var trip = await _context.Trips
                 .Include(t => t.Bookings)
-                .FirstOrDefaultAsync(t => t.Id == bookingDto.TripId);
+                .FirstOrDefaultAsync(t => t.Id == createBookingDto.TripId);
 
             if (trip == null)
                 throw new ArgumentException("Trip not found");
@@ -76,7 +65,7 @@ namespace StrayCat.Application.Services
             var totalBookedGuests = trip.Bookings?.Sum(b => b.GuestCount) ?? 0;
             var availableSlots = trip.MaxGuests - totalBookedGuests;
 
-            if (availableSlots < bookingDto.GuestCount)
+            if (availableSlots < createBookingDto.GuestCount)
                 throw new InvalidOperationException("Not enough available slots for this trip");
 
             // Generate unique reference code
@@ -87,25 +76,25 @@ namespace StrayCat.Application.Services
             } while (await _context.Bookings.AnyAsync(b => b.ReferenceCode == referenceCode));
 
             // Create payment intent
-            var paymentIntentClientSecret = await _paymentService.CreatePaymentIntentAsync(bookingDto.TotalPrice, "thb");
+            var paymentUrl = await _paymentService.CreatePaymentUrl(trip.Title, trip.Id, referenceCode, createBookingDto.TotalPrice, trip.Price, createBookingDto.GuestCount, trip.ImageUrl);
 
             var booking = new Booking
             {
-                TripId = bookingDto.TripId,
+                TripId = createBookingDto.TripId,
                 ReferenceCode = referenceCode,
-                CustomerName = bookingDto.CustomerName,
-                CustomerPhoneNo = bookingDto.CustomerPhoneNo,
-                CustomerEmail = bookingDto.CustomerEmail,
-                GuestCount = bookingDto.GuestCount,
-                Notes = bookingDto.Notes,
-                TotalPrice = bookingDto.TotalPrice - bookingDto.ServiceFee,
-                ServiceFee = bookingDto.ServiceFee,
-                GrandTotal = bookingDto.TotalPrice,
+                CustomerName = createBookingDto.CustomerName,
+                CustomerPhoneNo = createBookingDto.CustomerPhoneNo,
+                CustomerEmail = createBookingDto.CustomerEmail,
+                GuestCount = createBookingDto.GuestCount,
+                Notes = createBookingDto.Notes,
+                TotalPrice = createBookingDto.TotalPrice - createBookingDto.ServiceFee,
+                ServiceFee = createBookingDto.ServiceFee,
+                GrandTotal = createBookingDto.TotalPrice,
                 Status = BookingStatus.WaitingForPayment,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                PaymentIntentClientSecret = paymentIntentClientSecret,
-                IdCard = bookingDto.customerIDCard
+                PaymentIntentClientSecret = paymentUrl,
+                IdCard = createBookingDto.customerIDCard
             };
 
             _context.Bookings.Add(booking);
@@ -116,7 +105,7 @@ namespace StrayCat.Application.Services
             return new CreateBookingResponse
             {
                 Booking = createdBookingDto!,
-                PaymentIntentClientSecret = paymentIntentClientSecret
+                PaymentUrl = paymentUrl
             };
         }
 
@@ -157,6 +146,7 @@ namespace StrayCat.Application.Services
             try
             {
                 var booking = await _context.Bookings
+                .Include(b => b.Trip)
                     .FirstOrDefaultAsync(b => b.Id == bookingId && b.ReferenceCode == referenceCode);
 
                 if (booking == null)
@@ -193,6 +183,12 @@ namespace StrayCat.Application.Services
                 booking.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();
+
+                // Send LINE notification
+                var msg = $"{booking.GuestCount} guest booking made on Trip/Workshop ID: {booking.Trip.Title}";
+                var groupId = _configuration["LineMessaging:ToGroupId"];
+                await _lineMessagingService.SendMessageAsync(groupId, msg);
+                
                 Console.WriteLine($"Payment confirmed successfully for booking ID: {bookingId}");
                 return true;
             }
@@ -274,4 +270,3 @@ namespace StrayCat.Application.Services
             };
         }
     }
-}

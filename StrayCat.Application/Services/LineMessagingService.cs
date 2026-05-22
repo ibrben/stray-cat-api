@@ -141,7 +141,7 @@ public class LineMessagingService : ILineMessagingService
         Console.WriteLine($"User {webhookEvent.Source.UserId} unfollowed");
     }
 
-    private async Task<bool> SendMessageAsync(string toUserId, string message)
+    public async Task<bool> SendMessageAsync(string toUserId, string message)
     {
         try
         {

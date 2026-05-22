@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using StrayCat.Application.Interfaces;
+using StrayCat.Application.DTOs;
 using Stripe;
 
 namespace StrayCat.Application.Services;
@@ -79,5 +80,10 @@ public class PaymentService : IPaymentService
             Console.WriteLine($"Error confirming payment: {ex.Message}");
             return false;
         }
+    }
+    
+    public Task<string> CreatePaymentUrl(string productName, int productId, string refCode, decimal amount, decimal unitPrice, int quantity, string imgUrl)
+    {
+        throw new NotImplementedException();
     }
 }
