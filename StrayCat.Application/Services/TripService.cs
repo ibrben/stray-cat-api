@@ -22,8 +22,8 @@ namespace StrayCat.Application.Services
                 .Include(t => t.TripTags)
                 .Include(t => t.Bookings)
                 .Include(t => t.TripImages)
-                .Include(t => t.Highlights)
                 .Include(t => t.Organizer)
+                .Where(t => t.TripDates.Any(td => td.StartDate > DateTime.UtcNow))
                 .ToListAsync();
 
             return trips.Select(MapToTripDto);
@@ -250,7 +250,7 @@ namespace StrayCat.Application.Services
             {
                 TripId = trip.Id,
                 Title = trip.Title,
-                Description = trip.Description,
+                Description = trip.Description.Substring(0, Math.Min(trip.Description.Length, 150)),
                 MaxGuests = trip.MaxGuests,
                 Price = trip.Price,
                 ImageUrl = trip.ImageUrl,
@@ -260,13 +260,13 @@ namespace StrayCat.Application.Services
                 EndDate = firstDate?.EndDate,
                 Tags = trip.TripTags.Select(t => t.Name).ToList(),
                 Location = trip.Location,
-                Currency = trip.Currency,
-                Highlights = trip.Highlights.Select(h => h.Item).ToList(),
+                //Currency = trip.Currency,
+                //Highlights = trip.Highlights.Select(h => h.Item).ToList(),
                 IsPublished = trip.IsPublished,
                 Organizer = new OrganizerDto
                 {
                     Id = trip.Organizer?.Id ?? 0,
-                    Name = trip.Organizer?.Name ?? "Unknown Organizer"
+                    Name = trip.Organizer?.Name ?? "N/A"
                 },
                 BookedGuest = totalBookedGuests
             };

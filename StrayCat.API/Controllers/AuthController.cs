@@ -145,5 +145,12 @@ namespace StrayCat.API.Controllers
                 return Redirect(errorUrl);
             }
         }
+        [HttpPost("google/verify")]
+        public async Task<IActionResult> VerifyGoogleToken([FromBody] GoogleAuthRequestDto code)
+        {    
+            var response = await _authService.AuthenticateWithGoogleAsync(new GoogleAuthRequestDto { Code = code.Code });
+            return Ok(response);
+            
+        }
     }
 }
