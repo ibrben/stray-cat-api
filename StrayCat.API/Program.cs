@@ -12,6 +12,7 @@ using StrayCat.Domain.Entities;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
+using StrayCat.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -105,6 +106,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Use Request Logging Middleware
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 // Use CORS
 app.UseCors("AllowAll");
