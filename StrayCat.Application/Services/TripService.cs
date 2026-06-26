@@ -26,7 +26,7 @@ namespace StrayCat.Application.Services
                 .Where(t => t.TripDates.Any(td => td.StartDate > DateTime.UtcNow))
                 .ToListAsync();
 
-            return trips.Select(MapToTripDto);
+            return trips.Select(MapToTripDto).Select(TrimDescription);
         }
 
         public async Task<TripDto?> GetTripByIdAsync(int id)
@@ -250,7 +250,7 @@ namespace StrayCat.Application.Services
             {
                 TripId = trip.Id,
                 Title = trip.Title,
-                Description = trip.Description.Substring(0, Math.Min(trip.Description.Length, 150)),
+                Description = trip.Description,
                 MaxGuests = trip.MaxGuests,
                 Price = trip.Price,
                 ImageUrl = trip.ImageUrl,
@@ -270,6 +270,12 @@ namespace StrayCat.Application.Services
                 },
                 BookedGuest = totalBookedGuests
             };
+        }
+
+        private static TripDto TrimDescription(TripDto trip)
+        {
+            trip.Description = trip.Description.Substring(0, Math.Min(trip.Description.Length, 150));
+            return trip;
         }
     }
 }
