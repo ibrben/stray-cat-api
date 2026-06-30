@@ -101,6 +101,7 @@ namespace StrayCat.Application.Services
 
         public async Task<bool> UpdateTripAsync(int id, TripDto tripDto, int userId)
         {
+            Console.WriteLine(tripDto.ImageUrl);
             var existingTrip = await _context.Trips
                 .Include(t => t.TripDates)
                 .Include(t => t.TripTags)
@@ -123,7 +124,7 @@ namespace StrayCat.Application.Services
             existingTrip.Category = tripDto.Category;
             existingTrip.MaxGuests = tripDto.MaxGuests;
             existingTrip.Price = tripDto.Price;
-            existingTrip.ImageUrl = tripDto.ImageUrl?? existingTrip.ImageUrl;
+            existingTrip.ImageUrl = String.IsNullOrEmpty(tripDto.ImageUrl) ? existingTrip.ImageUrl : tripDto.ImageUrl;
             existingTrip.Type = tripDto.Type;
             existingTrip.UpdatedAt = DateTime.UtcNow;
 
