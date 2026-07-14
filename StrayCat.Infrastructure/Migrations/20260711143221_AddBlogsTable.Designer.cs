@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using StrayCat.Infrastructure.Data;
@@ -11,9 +12,11 @@ using StrayCat.Infrastructure.Data;
 namespace StrayCat.Infrastructure.Migrations
 {
     [DbContext(typeof(StrayCatDbContext))]
-    partial class StrayCatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260711143221_AddBlogsTable")]
+    partial class AddBlogsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,42 +82,6 @@ namespace StrayCat.Infrastructure.Migrations
                     b.HasIndex("TripId");
 
                     b.ToTable("blogs", (string)null);
-                });
-
-            modelBuilder.Entity("StrayCat.Domain.Entities.BlogImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BlogId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BlogId");
-
-                    b.ToTable("blog_images", (string)null);
                 });
 
             modelBuilder.Entity("StrayCat.Domain.Entities.Booking", b =>
@@ -489,17 +456,6 @@ namespace StrayCat.Infrastructure.Migrations
                     b.Navigation("Trip");
                 });
 
-            modelBuilder.Entity("StrayCat.Domain.Entities.BlogImage", b =>
-                {
-                    b.HasOne("StrayCat.Domain.Entities.Blog", "Blog")
-                        .WithMany("BlogImages")
-                        .HasForeignKey("BlogId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Blog");
-                });
-
             modelBuilder.Entity("StrayCat.Domain.Entities.Booking", b =>
                 {
                     b.HasOne("StrayCat.Domain.Entities.Trip", "Trip")
@@ -564,11 +520,6 @@ namespace StrayCat.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Trip");
-                });
-
-            modelBuilder.Entity("StrayCat.Domain.Entities.Blog", b =>
-                {
-                    b.Navigation("BlogImages");
                 });
 
             modelBuilder.Entity("StrayCat.Domain.Entities.Organizer", b =>

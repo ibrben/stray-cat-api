@@ -16,6 +16,8 @@ namespace StrayCat.Infrastructure.Data
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<TripImage> TripImages { get; set; }
         public DbSet<Highlight> Highlights { get; set; }
+        public DbSet<Blog> Blogs { get; set; }
+        public DbSet<BlogImage> BlogImages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -135,6 +137,43 @@ namespace StrayCat.Infrastructure.Data
                 entity.HasOne(h => h.Trip)
                       .WithMany(t => t.Highlights)
                       .HasForeignKey(h => h.TripId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+            
+            modelBuilder.Entity<Blog>(entity =>
+            {
+                entity.ToTable("blogs");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Content).IsRequired();
+                entity.Property(e => e.Author).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.FeaturedImageUrl).HasMaxLength(500);
+                entity.Property(e => e.Slug).HasMaxLength(200);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                
+                // Add unique constraint for Slug
+                entity.HasIndex(e => e.Slug).IsUnique();
+                
+                // Configure relationship with Trip (optional)
+                entity.HasOne(b => b.Trip)
+                      .WithMany(t => t.Blogs)
+                      .HasForeignKey(b => b.TripId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<BlogImage>(entity =>
+            {
+                entity.ToTable("blog_images");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.ImageUrl).IsRequired().HasMaxLength(500);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                
+                // Configure relationship with Blog
+                entity.HasOne(bi => bi.Blog)
+                      .WithMany(b => b.BlogImages)
+                      .HasForeignKey(bi => bi.BlogId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
         }

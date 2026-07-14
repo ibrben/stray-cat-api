@@ -30,5 +30,6 @@ namespace StrayCat.Domain.Entities
         public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
         public ICollection<TripImage> TripImages { get; set; } = new List<TripImage>();
         public ICollection<Highlight> Highlights { get; set; } = new List<Highlight>();
+        public ICollection<Blog> Blogs { get; set; } = new List<Blog>();
     }
 }

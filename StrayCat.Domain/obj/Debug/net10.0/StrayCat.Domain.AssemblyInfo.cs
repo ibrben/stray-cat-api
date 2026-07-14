@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StrayCat.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+325135f1495bf486a720a28ac189f5a5564da5e3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d0b0273a8767dd877d442d7ded3546976483b615")]
 [assembly: System.Reflection.AssemblyProductAttribute("StrayCat.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StrayCat.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

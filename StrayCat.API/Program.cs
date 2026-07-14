@@ -33,9 +33,10 @@ builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<GoogleAuthSet
 // Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowSpecificOrigins", policy =>
     {
-        policy.AllowAnyOrigin()
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+        policy.AllowAnyOrigin()//WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
@@ -51,6 +52,9 @@ builder.Services.AddScoped<ITripService, TripService>();
 // Register HighlightService
 builder.Services.AddScoped<IHighlightService, HighlightService>();
 
+// Register BlogService
+builder.Services.AddScoped<IBlogService, BlogService>();
+
 // Register Booking services
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IReferenceCodeGenerator, ReferenceCodeGenerator>();
@@ -64,6 +68,9 @@ builder.Services.AddScoped<IUrlService, UrlService>();
 // TripImage Service
 builder.Services.AddScoped<ITripImageService, TripImageService>();
 builder.Services.AddScoped<IStorageService, R2StorageService>();
+
+// BlogImage Service
+builder.Services.AddScoped<IBlogImageService, BlogImageService>();
 
 // Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
@@ -111,7 +118,7 @@ app.UseHttpsRedirection();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
 // Use CORS
-app.UseCors("AllowAll");
+app.UseCors("AllowSpecificOrigins");
 
 // Use Authentication
 app.UseAuthentication();
