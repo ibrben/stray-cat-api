@@ -62,4 +62,27 @@ namespace StrayCat.Application.DTOs
         public string FileName { get; set; } = string.Empty;
         public int DisplayOrder { get; set; }
     }
+
+    public class BlogPresignedUrlRequestDto
+    {
+        public int BlogId { get; set; }
+        public string FileName { get; set; } = string.Empty;
+        public bool IsFeaturedImage { get; set; }
+    }
+
+    public class MultipleBlogImagesRequestDto
+    {
+        [JsonPropertyName("blogId")]
+        public int BlogId { get; set; }
+        
+        [JsonPropertyName("imageUrls")]
+        public List<ImageUrlDto> ImageUrls { get; set; } = new();
+    }
+
+    public class BlogConfirmUploadDto
+    {
+        public int BlogId { get; set; }
+        public string FileName { get; set; } = string.Empty;
+        public int DisplayOrder { get; set; }
+    }
 }
