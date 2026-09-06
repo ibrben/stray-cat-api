@@ -41,6 +41,22 @@ namespace StrayCat.Application.DTOs
         
         [JsonPropertyName("trip")]
         public TripSummaryDto? Trip { get; set; }
+        
+        // New optional properties for guest blog writing
+        [JsonPropertyName("publisherName")]
+        public string? PublisherName { get; set; }
+        
+        [JsonPropertyName("excerpt")]
+        public string? Excerpt { get; set; }
+        
+        [JsonPropertyName("category")]
+        public string? Category { get; set; }
+        
+        [JsonPropertyName("publicationStatus")]
+        public string? PublicationStatus { get; set; }
+        
+        [JsonPropertyName("sourceInviteId")]
+        public string? SourceInviteId { get; set; }
     }
 
     public class CreateBlogDto
@@ -72,6 +88,19 @@ namespace StrayCat.Application.DTOs
         
         [JsonPropertyName("tripId")]
         public int? TripId { get; set; }
+        
+        // New optional properties for guest blog writing
+        [StringLength(120)]
+        [JsonPropertyName("publisherName")]
+        public string? PublisherName { get; set; }
+        
+        [StringLength(500)]
+        [JsonPropertyName("excerpt")]
+        public string? Excerpt { get; set; }
+        
+        [StringLength(100)]
+        [JsonPropertyName("category")]
+        public string? Category { get; set; }
     }
 
     public class UpdateBlogDto
@@ -103,5 +132,18 @@ namespace StrayCat.Application.DTOs
         
         [JsonPropertyName("tripId")]
         public int? TripId { get; set; }
+        
+        // New optional properties for guest blog writing
+        [StringLength(120)]
+        [JsonPropertyName("publisherName")]
+        public string? PublisherName { get; set; }
+        
+        [StringLength(500)]
+        [JsonPropertyName("excerpt")]
+        public string? Excerpt { get; set; }
+        
+        [StringLength(100)]
+        [JsonPropertyName("category")]
+        public string? Category { get; set; }
     }
 }

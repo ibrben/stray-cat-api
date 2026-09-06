@@ -34,5 +34,8 @@ namespace StrayCat.Domain.Entities
         
         // Navigation property for Trips
         public ICollection<Trip> Trips { get; set; } = new List<Trip>();
+        
+        // Navigation property for BlogWritingInvitations
+        public ICollection<BlogWritingInvitation> BlogWritingInvitations { get; set; } = new List<BlogWritingInvitation>();
     }
 }

@@ -18,6 +18,7 @@ namespace StrayCat.Infrastructure.Data
         public DbSet<Highlight> Highlights { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<BlogImage> BlogImages { get; set; }
+        public DbSet<BlogWritingInvitation> BlogWritingInvitations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -152,6 +153,13 @@ namespace StrayCat.Infrastructure.Data
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 
+                // New fields for guest blog writing
+                entity.Property(e => e.PublisherName).HasMaxLength(120);
+                entity.Property(e => e.SourceInviteId).HasMaxLength(50);
+                entity.Property(e => e.Excerpt).HasMaxLength(500);
+                entity.Property(e => e.Category).HasMaxLength(100);
+                entity.Property(e => e.PublicationStatus).HasConversion<int>();
+                
                 // Add unique constraint for Slug
                 entity.HasIndex(e => e.Slug).IsUnique();
                 
@@ -175,6 +183,33 @@ namespace StrayCat.Infrastructure.Data
                       .WithMany(b => b.BlogImages)
                       .HasForeignKey(bi => bi.BlogId)
                       .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<BlogWritingInvitation>(entity =>
+            {
+                entity.ToTable("blog_writing_invitations");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasMaxLength(50).ValueGeneratedOnAdd();
+                entity.Property(e => e.TokenHash).IsRequired().HasMaxLength(255);
+                entity.Property(e => e.ExpiresAt).IsRequired();
+                entity.Property(e => e.MaxSubmissions).IsRequired();
+                entity.Property(e => e.SubmissionCount).IsRequired().HasDefaultValue(0);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                
+                // Add unique constraint for TokenHash
+                entity.HasIndex(e => e.TokenHash).IsUnique();
+                
+                // Configure relationship with Organizer
+                entity.HasOne(bwi => bwi.Owner)
+                      .WithMany(o => o.BlogWritingInvitations)
+                      .HasForeignKey(bwi => bwi.OwnerUserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                
+                // Configure relationship with Trip (optional)
+                entity.HasOne(bwi => bwi.Trip)
+                      .WithMany(t => t.BlogWritingInvitations)
+                      .HasForeignKey(bwi => bwi.TripId)
+                      .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }
