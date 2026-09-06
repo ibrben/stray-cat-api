@@ -40,7 +40,9 @@ A .NET 10.0 Web API for managing trips, bookings, and user authentication with G
    ```
 
 3. **Access the API**:
-   - API URL: `http://localhost:5000`
+   - API URL: `http://localhost:5168`
+   - Swagger UI: `http://localhost:5168/swagger`
+   - OpenAPI document: `http://localhost:5168/swagger/v1/swagger.json`
    - Database: `localhost:5432`
 
 ### Docker Compose Services
@@ -100,6 +102,12 @@ The application uses the following environment variables (can be configured in `
    ```bash
    dotnet run --project StrayCat.API
    ```
+
+5. **Open the interactive API documentation**:
+   - Swagger UI: `http://localhost:5169/swagger`
+   - OpenAPI document: `http://localhost:5169/swagger/v1/swagger.json`
+
+   Protected endpoints can be tested by selecting **Authorize** and entering the JWT access token. Swagger is exposed only while the application runs in the `Development` environment.
 
 ## API Endpoints
 
