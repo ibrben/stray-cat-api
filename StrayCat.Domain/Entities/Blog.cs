@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using StrayCat.Domain.Enums;
 
 namespace StrayCat.Domain.Entities
 {
@@ -34,6 +35,21 @@ namespace StrayCat.Domain.Entities
         public DateTime CreatedAt { get; set; }
         
         public DateTime UpdatedAt { get; set; }
+        
+        // New fields for guest blog writing
+        [StringLength(120)]
+        public string? PublisherName { get; set; }
+        
+        [StringLength(50)]
+        public string? SourceInviteId { get; set; }
+        
+        public PublicationStatus PublicationStatus { get; set; } = PublicationStatus.Draft;
+        
+        [StringLength(500)]
+        public string? Excerpt { get; set; }
+        
+        [StringLength(100)]
+        public string? Category { get; set; }
         
         // Navigation properties
         public Trip? Trip { get; set; }

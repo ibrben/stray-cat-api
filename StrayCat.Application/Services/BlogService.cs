@@ -2,7 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using StrayCat.Application.DTOs;
 using StrayCat.Application.Interfaces;
 using StrayCat.Domain.Entities;
+using StrayCat.Domain.Enums;
 using StrayCat.Infrastructure.Data;
+using System.Text.RegularExpressions;
 
 namespace StrayCat.Application.Services
 {
@@ -50,6 +52,9 @@ namespace StrayCat.Application.Services
                 Title = blogDto.Title,
                 Content = blogDto.Content,
                 Author = blogDto.Author,
+                PublisherName = blogDto.PublisherName,
+                Excerpt = blogDto.Excerpt,
+                Category = blogDto.Category,
                 FeaturedImageUrl = blogDto.FeaturedImageUrl,
                 Slug = blogDto.Slug,
                 IsPublished = blogDto.IsPublished,
@@ -58,6 +63,14 @@ namespace StrayCat.Application.Services
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
+            if (string.IsNullOrEmpty(blogDto.FeaturedImageUrl))
+            {
+                var match = Regex.Match(blogDto.Content, @"!\[.*?\]\((.*?)\)", RegexOptions.Singleline);
+                if (match.Success)
+                {
+                    blog.FeaturedImageUrl = match.Groups[1].Value;
+                }
+            }
 
             _context.Blogs.Add(blog);
             await _context.SaveChangesAsync();
@@ -77,21 +90,35 @@ namespace StrayCat.Application.Services
             existingBlog.Title = blogDto.Title;
             existingBlog.Content = blogDto.Content;
             existingBlog.Author = blogDto.Author;
+            existingBlog.PublisherName = blogDto.PublisherName;
+            existingBlog.Excerpt = blogDto.Excerpt;
+            existingBlog.Category = blogDto.Category;
             existingBlog.FeaturedImageUrl = blogDto.FeaturedImageUrl;
             existingBlog.Slug = blogDto.Slug;
             existingBlog.TripId = blogDto.TripId;
             existingBlog.UpdatedAt = DateTime.UtcNow;
+
+            if (string.IsNullOrEmpty(existingBlog.FeaturedImageUrl))
+            {
+                var match = Regex.Match(blogDto.Content, @"!\[.*?\]\((.*?)\)", RegexOptions.Singleline);
+                if (match.Success)
+                {
+                    existingBlog.FeaturedImageUrl = match.Groups[1].Value;
+                }
+            }
 
             // Update published status and date
             if (blogDto.IsPublished && !existingBlog.IsPublished)
             {
                 existingBlog.IsPublished = true;
                 existingBlog.PublishedAt = DateTime.UtcNow;
+                existingBlog.PublicationStatus = PublicationStatus.Published;
             }
             else if (!blogDto.IsPublished)
             {
                 existingBlog.IsPublished = false;
                 existingBlog.PublishedAt = null;
+                existingBlog.PublicationStatus = PublicationStatus.Draft;
             }
 
             await _context.SaveChangesAsync();
@@ -108,6 +135,14 @@ namespace StrayCat.Application.Services
             _context.Blogs.Remove(blog);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<BlogDto?> CreateGuestBlogAsync(Blog blog)
+        {
+            _context.Blogs.Add(blog);
+            await _context.SaveChangesAsync();
+
+            return await GetBlogByIdAsync(blog.Id);
         }
 
         private static BlogDto MapToBlogDto(Blog blog)
@@ -129,7 +164,12 @@ namespace StrayCat.Application.Services
                 {
                     TripId = blog.Trip.Id,
                     Title = blog.Trip.Title
-                } : null
+                } : null,
+                PublisherName = blog.PublisherName,
+                Excerpt = blog.Excerpt,
+                Category = blog.Category,
+                PublicationStatus = blog.PublicationStatus.ToString().ToLowerInvariant(),
+                SourceInviteId = blog.SourceInviteId
             };
         }
     }

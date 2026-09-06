@@ -1,4 +1,5 @@
 using StrayCat.Application.DTOs;
+using StrayCat.Domain.Entities;
 
 namespace StrayCat.Application.Interfaces
 {
@@ -10,5 +11,6 @@ namespace StrayCat.Application.Interfaces
         Task<BlogDto> CreateBlogAsync(CreateBlogDto blog);
         Task<BlogDto?> UpdateBlogAsync(int id, UpdateBlogDto blog);
         Task<bool> DeleteBlogAsync(int id);
+        Task<BlogDto?> CreateGuestBlogAsync(Blog blog);
     }
 }
