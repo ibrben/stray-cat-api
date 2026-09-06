@@ -12,14 +12,37 @@ using StrayCat.Domain.Entities;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
+using Microsoft.OpenApi;
 using StrayCat.API.Middleware;
+using StrayCat.Application.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "StrayCat API",
+        Version = "v1",
+        Description = "API for managing StrayCat trips, bookings, blogs, payments, and authentication."
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Enter the JWT access token returned by the authentication endpoint."
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    });
+});
 
 // Configure strongly-typed settings
 builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("Frontend"));
@@ -54,6 +77,9 @@ builder.Services.AddScoped<IHighlightService, HighlightService>();
 
 // Register BlogService
 builder.Services.AddScoped<IBlogService, BlogService>();
+
+// Register BlogWritingInvitationService
+builder.Services.AddScoped<IBlogWritingInvitationService, BlogWritingInvitationService>();
 
 // Register Booking services
 builder.Services.AddScoped<IBookingService, BookingService>();
@@ -109,7 +135,13 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "StrayCat API v1");
+        options.RoutePrefix = "swagger";
+        options.DisplayRequestDuration();
+    });
 }
 
 app.UseHttpsRedirection();
@@ -143,4 +175,3 @@ using (var scope = app.Services.CreateScope())
 app.MapControllers();
 
 app.Run();
-
